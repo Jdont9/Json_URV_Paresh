@@ -1,0 +1,25 @@
+name: Update bundle JSON
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # tous les jours à 8h UTC
+  workflow_dispatch:       # déclenchable manuellement depuis l'onglet Actions
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run script
+        run: python generate.py
+
+      - name: Commit & push si changement
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add bundle.json
+          git diff --cached --quiet || (git commit -m "Update bundle.json" && git push)
